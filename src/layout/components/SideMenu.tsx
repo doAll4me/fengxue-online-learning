@@ -1,56 +1,31 @@
 // 侧边栏
 import React from 'react';
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { Menu } from 'antd';
+import { mainRouters } from '../../router';
+import { useNavigate } from 'react-router-dom';
+import { toMenuItems } from '../../router/toMenuItems';
+import { useLocation } from 'react-router-dom';
 
 type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  } as MenuItem;
-}
-
 type Props = {};
 
-const items: MenuItem[] = [
-  getItem('Option 1', '1', <PieChartOutlined />),
-  getItem('Option 2', '2', <DesktopOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [
-    getItem('Tom', '3'),
-    getItem('Bill', '4'),
-    getItem('Alex', '5'),
-  ]),
-  getItem('Team', 'sub2', <TeamOutlined />, [
-    getItem('Team 1', '6'),
-    getItem('Team 2', '8'),
-  ]),
-  getItem('Files', '9', <FileOutlined />),
-];
-
 export default function SideMenu({}: Props) {
+  const navigate = useNavigate(); //跳转网页的hook函数
+  const location = useLocation(); //获取当前路由路径的hook函数
+  function handleMenu({ key }: { key: string }) {
+    // console.log(key);
+    navigate(key);
+  }
   return (
     <div>
       <Menu
         theme="dark"
         defaultSelectedKeys={['1']}
         mode="inline"
-        items={items}
+        items={toMenuItems(mainRouters)}
+        onClick={handleMenu}
+        selectedKeys={[location.pathname]}
       />
     </div>
   );
