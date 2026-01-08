@@ -10,6 +10,7 @@ import Category from '../views/Category';
 import Course from '../views/Course';
 import Role from '../views/System/Role';
 import { IMenuType } from './inter';
+import User from '../views/System/User';
 
 export const mainRouters: IMenuType[] = [
   {
@@ -36,8 +37,21 @@ export const mainRouters: IMenuType[] = [
   {
     key: '/system/role',
     icon: <UserOutlined />,
-    label: '角色管理',
-    title: '角色管理',
-    element: <Role />,
+    label: '系统设置',
+    title: '系统设置',
+    children: [
+      {
+        key: '/system/role',
+        label: '角色管理',
+        title: '角色管理',
+        element: <Role />,
+      },
+      {
+        key: '/system/user',
+        label: '用户管理',
+        title: '用户管理',
+        element: <User />,
+      },
+    ],
   },
 ];

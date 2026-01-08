@@ -6,5 +6,5 @@ export interface IMenuType {
   title: string;
   icon?: ReactNode;
   element?: ReactNode;
-  children?: IMenuType[];
+  children?: IMenuType[]; //可选（子菜单、二级菜单
 }
