@@ -1,17 +1,24 @@
 import { Button, Col, Modal, Row, Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { categoryGet, categoryPost } from '../../api/course';
+import { categoryGet, categoryPost, categoryPut } from '../../api/course';
 import { Flex, Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import { categoryType } from '../../types/course';
 import CateForm from './components/CateForm';
+
+const handleChange = (checked: boolean, id: string) => {
+  // console.log(checked, id);
+  categoryPut(id, checked); //更新数据状态，存储到数据库的数据里了
+};
 
 const columns: TableProps<categoryType>['columns'] = [
   {
     title: '类目级别',
     dataIndex: 'parentId', //跟当前这一列要渲染的字段
     key: 'parentId',
-    render: (text) => <a>{text}</a>,
+    render: (text) => {
+      return text === '0-0' ? '顶级类目' : '';
+    },
   },
   {
     title: '分类名称',
@@ -22,7 +29,15 @@ const columns: TableProps<categoryType>['columns'] = [
     title: '是否上架',
     dataIndex: 'isshow',
     key: 'isshow',
-    render: (bool: boolean) => <Switch defaultChecked={bool} />,
+    render: (bool: boolean, record) => (
+      <Switch
+        defaultChecked={bool}
+        onChange={(checked) => {
+          handleChange(checked, record.objectId as string);
+          // xx as 某个类型 ———>ts断言
+        }}
+      />
+    ),
   },
   {
     title: '操作',
@@ -56,10 +71,24 @@ const columns: TableProps<categoryType>['columns'] = [
 type Props = {};
 
 export default function Category({}: Props) {
-  const [cateList, setCateList] = useState();
+  const [cateList, setCateList] = useState<categoryType[]>([]); //要加泛型！！！！！！！！！！
   useEffect(() => {
     categoryGet().then((res) => {
-      setCateList(res.data.results);
+      let { results } = res.data;
+      //筛选出顶级类目
+      let parentArr = results.filter(
+        (item: categoryType) => item.parentId === '0-0',
+      );
+      // 筛选出二级类目（前端
+      parentArr.forEach((item: categoryType) => {
+        let children = results.filter(
+          (child: categoryType) => child.parentId === item.objectId,
+        );
+        if (children.length) {
+          item.children = children; //没有子集就不给children字段
+        }
+      });
+      setCateList(parentArr); //用处理后的数据去渲染
     });
   }, []);
 
@@ -69,6 +98,31 @@ export default function Category({}: Props) {
   };
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  // 接收表单提交函数
+  const updateCateList = (category: categoryType) => {
+    // console.log(category);
+    // 新增类目后实时更新渲染
+    if (category.parentId == '0-0') {
+      // cateList.push(category);
+      // setCateList([...cateList]);
+
+      setCateList([...cateList, category]); //添加新增的类目(顶级)
+    } else {
+      // 新增二级类目
+      // 分情况:已有children的父级类目新增子集/还没有children的父级类目新增子集（要添加children字段
+      // category.parentId==cateList[i].objectId  如果有 就证明第i个cate就是新增类别的父类
+      let idx = cateList.findIndex(
+        (item) => item.objectId == category.parentId,
+      );
+      if (cateList[idx].children) {
+        cateList[idx].children!.push(category); //已有children的父级类目新增子集
+      } else {
+        cateList[idx].children = [category]; //还没有children的父级类目新增子集
+      }
+      setCateList(cateList);
+    }
   };
 
   return (
@@ -93,7 +147,11 @@ export default function Category({}: Props) {
         </Col>
       </Row>
       {/* 数据展示表格内容 */}
-      <Table<categoryType> columns={columns} dataSource={cateList} />
+      <Table<categoryType>
+        columns={columns}
+        dataSource={cateList}
+        rowKey="objectId"
+      />
       {/* 新增分类弹窗 */}
       <Modal
         title="Basic Modal"
@@ -101,7 +159,11 @@ export default function Category({}: Props) {
         open={isModalOpen}
         footer={null}
       >
-        <CateForm handleCancel={handleCancel} />
+        <CateForm
+          handleCancel={handleCancel}
+          cateList={cateList}
+          updateCateList={updateCateList}
+        />
       </Modal>
     </div>
   );
