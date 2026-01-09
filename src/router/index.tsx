@@ -35,7 +35,7 @@ export const mainRouters: IMenuType[] = [
     element: <Course />,
   },
   {
-    key: '/system/role',
+    key: '/system',
     icon: <UserOutlined />,
     label: '系统设置',
     title: '系统设置',

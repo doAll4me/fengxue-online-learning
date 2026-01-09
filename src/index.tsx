@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'antd/dist/reset.css';
 import { HashRouter } from 'react-router-dom';
+import { ConfigProvider } from 'antd';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -12,7 +13,19 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <HashRouter>
-      <App />
+      <ConfigProvider
+        theme={{
+          token: {
+            // Seed Token，影响范围大
+            colorPrimary: '#6E48C2',
+            borderRadius: 2,
+            // 派生变量，影响范围小
+            // colorBgContainer: '#f6ffed',
+          },
+        }}
+      >
+        <App />
+      </ConfigProvider>
     </HashRouter>
   </React.StrictMode>,
 );
