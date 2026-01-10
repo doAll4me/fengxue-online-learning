@@ -6,10 +6,19 @@ import reportWebVitals from './reportWebVitals';
 import 'antd/dist/reset.css';
 import { HashRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
+import  AV  from 'leancloud-storage'; //引入SDK
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
+
+// leanCloud的SDK初始化
+AV.init({
+  appId: 'oBqVbt0qR8dm1PJ1Xk2x4pVz-MdYXbMMI',
+  appKey: 'kM6y59WD2OykQ9kP85xGN73I',
+  serverURL: 'https://obqvbt0q.api.lncldglobal.com',
+});
+
 root.render(
   <React.StrictMode>
     <HashRouter>

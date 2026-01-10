@@ -11,6 +11,7 @@ import Course from '../views/Course';
 import Role from '../views/System/Role';
 import { IMenuType } from './inter';
 import User from '../views/System/User';
+import CoursePub from '../views/Course/pub';
 
 export const mainRouters: IMenuType[] = [
   {
@@ -33,6 +34,13 @@ export const mainRouters: IMenuType[] = [
     label: '课程管理',
     title: '课程管理',
     element: <Course />,
+  },
+  {
+    key: '/course/pub',
+    icon: <DesktopOutlined />,
+    label: '课程发布',
+    title: '课程发布',
+    element: <CoursePub />,
   },
   {
     key: '/system',

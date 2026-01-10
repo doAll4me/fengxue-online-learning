@@ -8,3 +8,14 @@ export interface categoryType {
   isshow: boolean;
   children?: categoryType[];
 }
+
+export interface CourseType {
+  objectId?: string;
+  name: string;
+  poster: string; //课程封面
+  lv1: string; //课程分类-一级类目名称
+  lv2: string; //二级类目名称
+  isvip: boolean;
+  intro: string;
+  detail: string;
+}

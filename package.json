@@ -13,6 +13,7 @@
     "@types/react-dom": "^19.2.3",
     "antd": "^6.1.4",
     "axios": "^1.13.2",
+    "leancloud-storage": "^4.15.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router-dom": "^6.30.2",
