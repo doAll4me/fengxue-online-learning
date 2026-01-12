@@ -18,4 +18,5 @@ export interface CourseType {
   isvip: boolean;
   intro: string;
   detail: string;
+  cate: Array<string>;
 }

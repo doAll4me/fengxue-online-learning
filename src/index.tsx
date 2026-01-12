@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import 'antd/dist/reset.css';
 import { HashRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
-import  AV  from 'leancloud-storage'; //引入SDK
+import AV from 'leancloud-storage'; //引入SDK
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,

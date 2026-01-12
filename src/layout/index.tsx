@@ -72,7 +72,13 @@ const App: React.FC = () => {
               })} */}
               {/* 所以使用我们处理过后的realRoutes */}
               {realRoutes.map((item) => {
-                return <Route path={item.key} element={item.element}></Route>;
+                return (
+                  <Route
+                    key={item.key}
+                    path={item.key}
+                    element={item.element}
+                  ></Route>
+                );
               })}
             </Routes>
           </div>

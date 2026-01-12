@@ -1,7 +1,217 @@
-import React from 'react';
+import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable, TableDropdown } from '@ant-design/pro-components';
+import { Button, Dropdown, Image, Space, Tag } from 'antd';
+import { useRef } from 'react';
+import request from 'umi-request';
+import { CourseType } from '../../types/course';
+import { courseGet } from '../../api/course';
+import { useNavigate } from 'react-router-dom';
+export const waitTimePromise = async (time: number = 100) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
+};
 
-type Props = {};
+export const waitTime = async (time: number = 100) => {
+  await waitTimePromise(time);
+};
 
-export default function Course({}: Props) {
-  return <div>Course</div>;
-}
+type GithubIssueItem = {
+  url: string;
+  id: number;
+  number: number;
+  title: string;
+  labels: {
+    name: string;
+    color: string;
+  }[];
+  state: string;
+  comments: number;
+  created_at: string;
+  updated_at: string;
+  closed_at?: string;
+};
+
+const columns: ProColumns<CourseType>[] = [
+  {
+    dataIndex: 'index',
+    valueType: 'indexBorder',
+    width: 48,
+  },
+  {
+    title: '课程名称',
+    dataIndex: 'name',
+    copyable: true, //可不可以复制
+    ellipsis: true, //自动缩略
+  },
+  {
+    // disable: true,
+    title: '是否会员课程',
+    dataIndex: 'isvip',
+    filters: true,
+    onFilter: false,
+    ellipsis: true,
+    valueType: 'select',
+    // 枚举（下来列表选项
+    valueEnum: {
+      1: {
+        text: '会员课程',
+        status: 'vip',
+      },
+      2: {
+        text: '免费课程',
+        status: 'free',
+      },
+    },
+    render: (_dom, record) => {
+      const isVip = record.isvip === true;
+      const color = isVip ? 'magenta' : 'green';
+      const text = isVip ? '会员课程' : '免费课程';
+      return (
+        <Tag style={{ background: 'transparent', borderColor: color, color }}>
+          {text}
+        </Tag>
+      );
+    },
+  },
+  {
+    disable: true,
+    title: '课程封面',
+    dataIndex: 'poster',
+    search: false, //控制搜索区组件是否显示
+    renderFormItem: (_, { defaultRender }) => {
+      return defaultRender(_);
+    },
+    render: (url: any, record) => (
+      <Space>
+        <Image src={url} />
+      </Space>
+    ),
+  },
+  {
+    title: '创建时间',
+    key: 'createdAt',
+    dataIndex: 'createdAt',
+    valueType: 'date',
+    sorter: true,
+  },
+  {
+    title: '操作',
+    valueType: 'option',
+    key: 'option',
+    render: (text, record, _, action) => [
+      <a key="editable">编辑</a>,
+      <a target="_blank" rel="noopener noreferrer" key="view">
+        查看
+      </a>,
+      <TableDropdown
+        key="actionGroup"
+        onSelect={() => action?.reload()}
+        menus={[
+          { key: 'copy', name: '复制' },
+          { key: 'delete', name: '删除' },
+        ]}
+      />,
+    ],
+  },
+];
+export default () => {
+  const actionRef = useRef<ActionType | null>(null);
+  const navigate = useNavigate();
+  return (
+    <ProTable<CourseType>
+      columns={columns}
+      actionRef={actionRef}
+      cardBordered
+      request={async (params, sort, filter) => {
+        console.log(params, sort, filter);
+
+        // 带参数请求（自定义查询
+        let { name, isvip } = params;
+        let res = await courseGet({ name, isvip });
+        return {
+          data: res.data.results, //这个数据会给表格渲染
+          success: true,
+        };
+      }}
+      editable={{
+        type: 'multiple',
+      }}
+      columnsState={{
+        persistenceKey: 'pro-table-singe-demos',
+        persistenceType: 'localStorage',
+        defaultValue: {
+          option: { fixed: 'right', disable: true },
+        },
+        onChange(value) {
+          console.log('value: ', value);
+        },
+      }}
+      rowKey="id"
+      search={{
+        labelWidth: 'auto',
+      }}
+      options={{
+        setting: {
+          listsHeight: 400,
+        },
+      }}
+      form={{
+        // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
+        syncToUrl: (values, type) => {
+          if (type === 'get') {
+            return {
+              ...values,
+              created_at: [values.startTime, values.endTime],
+            };
+          }
+          return values;
+        },
+      }}
+      pagination={{
+        pageSize: 5,
+        onChange: (page) => console.log(page),
+      }}
+      dateFormatter="string"
+      headerTitle="课程列表"
+      toolBarRender={() => [
+        <Button
+          key="button"
+          icon={<PlusOutlined />}
+          onClick={() => {
+            navigate('/course/pub');
+          }}
+          type="primary"
+        >
+          新建
+        </Button>,
+        <Dropdown
+          key="menu"
+          menu={{
+            items: [
+              {
+                label: '1st item',
+                key: '1',
+              },
+              {
+                label: '2nd item',
+                key: '2',
+              },
+              {
+                label: '3rd item',
+                key: '3',
+              },
+            ],
+          }}
+        >
+          <Button>
+            <EllipsisOutlined />
+          </Button>
+        </Dropdown>,
+      ]}
+    />
+  );
+};

@@ -153,12 +153,7 @@ export default function Category({}: Props) {
         rowKey="objectId"
       />
       {/* 新增分类弹窗 */}
-      <Modal
-        title="Basic Modal"
-        closable={{ 'aria-label': 'Custom Close Button' }}
-        open={isModalOpen}
-        footer={null}
-      >
+      <Modal title="Basic Modal" open={isModalOpen} footer={null}>
         <CateForm
           handleCancel={handleCancel}
           cateList={cateList}

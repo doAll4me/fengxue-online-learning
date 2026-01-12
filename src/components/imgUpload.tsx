@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Flex, message, Upload } from 'antd';
-import type { GetProp, UploadProps } from 'antd';
+import type { UploadProps } from 'antd';
+import type { RcFile } from 'antd/es/upload/interface';
 import AV from 'leancloud-storage';
 
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-
+type FileType = RcFile;
 const getBase64 = (img: FileType, callback: (url: string) => void) => {
   const reader = new FileReader();
   reader.addEventListener('load', () => callback(reader.result as string));
@@ -24,7 +24,13 @@ const beforeUpload = (file: FileType) => {
   return isJpgOrPng && isLt2M;
 };
 
-const ImgUpload: React.FC = () => {
+type IProps = {
+  onChange?: (arg: string) => void; //定义props的类型，写上我们要用的onchange函数，以及传的参数
+};
+
+const ImgUpload: React.FC<IProps> = (props) => {
+  // console.log('@@', props);
+
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>();
 
@@ -45,8 +51,9 @@ const ImgUpload: React.FC = () => {
 
   // 通过自定义方法上传 customRequest 【此项目选择本方案】
   const handleUpload = (info: any) => {
-    console.log(info.file); //info.file是文件执行对象
+    // console.log(info.file); //info.file是文件执行对象
     // 转化为后端要求的格式 base64编码字符串
+    setLoading(true);
     getBase64(info.file, async (mybase64) => {
       // console.log(mybase64); //对图片file进行了特殊编码data:image/png;base64,iVBORw0KG...（这个编码可以直接访问图片
       // setImageUrl(base64);
@@ -59,6 +66,9 @@ const ImgUpload: React.FC = () => {
       // console.log(res);返回的url是真正的线上链接
       let { url } = res.attributes;
       setImageUrl(url); //上传后预览图片
+      props.onChange!(url); //将图片数据传递给父级表单form
+      // 这样form就能得到poster的图片链接
+      setLoading(false);
     });
   };
 
@@ -70,7 +80,7 @@ const ImgUpload: React.FC = () => {
   );
 
   return (
-    <Flex gap="middle" wrap>
+    <Flex gap="middle" wrap="wrap">
       <Upload
         name="avatar"
         listType="picture-card"

@@ -41,6 +41,7 @@ export const mainRouters: IMenuType[] = [
     label: '课程发布',
     title: '课程发布',
     element: <CoursePub />,
+    hide: true,
   },
   {
     key: '/system',
